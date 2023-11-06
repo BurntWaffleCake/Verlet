@@ -1,0 +1,33 @@
+html,
+body {
+  box-sizing: border-box;
+  height: 100vh;
+  width: 100vw;
+  padding: 0%;
+  margin: 0%;
+  overflow: hidden;
+}
+
+canvas {
+  height: 100%;
+  width: 100%;
+}
+
+#options {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
+#options-button {
+  left: 100%;
+  position: absolute;
+  height: 5rem;
+}
+
+#options-body {
+  background-color: red;
+  display: none;
+  width: 10rem;
+  height: 10rem;
+}
