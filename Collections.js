@@ -9,6 +9,7 @@ export class Node {
     this.a = { x: dx, y: dy };
     this.mass = mass;
     this.groundFriction = 0.7;
+    this.selectable = true;
   }
 
   render(ctx) {
@@ -65,10 +66,10 @@ export class Node {
 }
 
 export class Link {
-  constructor(nodeA, nodeB, length) {
+  constructor(nodeA, nodeB, length, stiffness = 1.5) {
     this.a = nodeA;
     this.b = nodeB;
-    this.stiffness = 1.5;
+    this.stiffness = stiffness;
     if (!length || typeof length != "number") {
       this.length = Math.sqrt((this.a.pos.x - this.b.pos.x) ** 2 + (this.a.pos.y - this.b.pos.y) ** 2);
     } else {

@@ -16,35 +16,20 @@ function loop(time) {
   t = time / 1000;
   updateCanvasSize();
 
-  if (mousedown) {
-    let minNode = null;
-    let minDis = Number.MAX_VALUE;
-    let mindx = 0;
-    let mindy = 0;
-    for (let node of nodes) {
-      let dx = mousepos.x - node.pos.x;
-      let dy = mousepos.y - node.pos.y;
-      let dis = Math.sqrt(dx * dx + dy * dy);
-      console.log(dis);
-      if (minDis > dis) {
-        minNode = node;
-        minDis = dis;
-        mindx = dx;
-        mindy = dy;
-      }
-    }
+  if (minNode) {
+    let dx = mousepos.x - minNode.pos.x;
+    let dy = mousepos.y - minNode.pos.y;
 
-    minNode.pos.x += mindx * dt;
-    minNode.pos.y += mindy * dt;
+    minNode.pos.x += 2 * dx * dt;
+    minNode.pos.y += 2 * dy * dt;
   }
-  // for (let dti = dt / 6; dti < dt; dti += dt / 6) {
+
   calculate(dt);
-  // }
+
   render(dt);
 
   window.requestAnimationFrame(loop);
 }
-
 function init() {
   window.requestAnimationFrame(loop);
 }
@@ -57,6 +42,14 @@ function render(dt) {
 
   for (let link of links) {
     link.render(ctx);
+  }
+
+  if (minNode) {
+    ctx.strokeStyle = "rgb(255,0,0)";
+    ctx.beginPath();
+    ctx.moveTo(mousepos.x, mousepos.y);
+    ctx.lineTo(minNode.pos.x, minNode.pos.y);
+    ctx.stroke();
   }
 }
 
@@ -77,6 +70,111 @@ let link5 = new Link(node, node3, 141.42135623);
 let link6 = new Link(node2, node4, 141.42135623);
 
 let links = [link, link2, link3, link4, link5, link6];
+
+function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiffness) {
+  let grid = [];
+  for (let sy = 0; sy < height; sy++) {
+    let row = [];
+    for (let sx = 0; sx < width; sx++) {
+      let node = new Node(radius, x + sx * spacing, y + sy * spacing);
+      node.selectable = false;
+      nodes.push(node);
+      row.push(node);
+    }
+    grid.push(row);
+  }
+
+  for (let sy = 0; sy < grid.length - 1; sy++) {
+    let row = grid[sy];
+    let nextRow = grid[sy + 1];
+    for (let sx = 0; sx < row.length - 1; sx++) {
+      links.push(new Link(row[sx], row[sx + 1], spacing, stiffness));
+      links.push(new Link(row[sx], nextRow[sx], spacing, stiffness));
+    }
+    links.push(new Link(row[row.length - 1], nextRow[nextRow.length - 1], spacing));
+  }
+
+  let lastRow = grid[grid.length - 1];
+  for (let sx = 0; sx < lastRow.length - 1; sx++) {
+    links.push(new Link(lastRow[sx], lastRow[sx + 1], spacing, stiffness));
+  }
+
+  switch (type) {
+    case "corner-spaced":
+      grid[0].forEach((element, index) => {
+        if (index % 10 == 0) {
+          element.pinned = true;
+          element.radius = 5;
+          element.selectable = true;
+        }
+      });
+
+      grid[grid.length - 1].forEach((element, index) => {
+        if (index % 10 == 0) {
+          element.pinned = true;
+          element.radius = 5;
+          element.selectable = true;
+        }
+      });
+
+      grid.forEach((element, index) => {
+        if (index % 10 == 0) {
+          element[0].pinned = true;
+          element[0].radius = 5;
+          element[0].selectable = true;
+        }
+      });
+
+      grid.forEach((element, index) => {
+        if (index % 10 == 0) {
+          element[element.length - 1].pinned = true;
+          element[element.length - 1].radius = 5;
+          element[element.length - 1].selectable = true;
+        }
+      });
+
+      grid[grid.length - 1][grid[0].length - 1].pinned = true;
+      grid[grid.length - 1][grid[0].length - 1].radius = 5;
+      grid[grid.length - 1][grid[0].length - 1].selectable = true;
+
+      break;
+    case "corner":
+      grid[0][0].pinned = true;
+      grid[0][grid[0].length - 1].pinned = true;
+      grid[grid.length - 1][0].pinned = true;
+      grid[grid.length - 1][grid[0].length - 1].pinned = true;
+
+      grid[0][0].selectable = true;
+      grid[0][grid[0].length - 1].selectable = true;
+      grid[grid.length - 1][0].selectable = true;
+      grid[grid.length - 1][grid[0].length - 1].selectable = true;
+      break;
+
+    case "spaced":
+      grid[0].forEach((element, index) => {
+        if (index % 10 == 0) {
+          element.pinned = true;
+          element.selectable = true;
+        }
+      });
+
+      grid[0][0].pinned = true;
+      grid[0][grid[0].length - 1].pinned = true;
+
+      grid[0][0].selectable = true;
+      grid[0][grid[0].length - 1].selectable = true;
+      break;
+
+    default:
+      grid[0].forEach((element, index) => {
+        element.pinned = true;
+        element.selectable = true;
+      });
+      break;
+  }
+}
+
+generateGrid("corner-spaced", 100, 100, 30, 30, 10, 1, 1.5);
 
 function calculate(dt) {
   for (let node of nodes) {
@@ -110,10 +208,37 @@ document.addEventListener("mousemove", (event) => {
   mousepos.y = event.clientY;
 });
 
+let minNode = undefined;
 document.addEventListener("mousedown", (event) => {
   mousedown = true;
+
+  let minDis = Number.MAX_SAFE_INTEGER;
+  for (let node of nodes) {
+    if (!node.selectable && event.buttons == 2) {
+      continue;
+    }
+    let dx = mousepos.x - node.pos.x;
+    let dy = mousepos.y - node.pos.y;
+    let dis = Math.sqrt(dx * dx + dy * dy);
+    if (dis < minDis) {
+      minNode = node;
+      minDis = dis;
+    }
+  }
 });
 
 document.addEventListener("mouseup", (event) => {
+  minNode = undefined;
   mousedown = false;
 });
+
+document.oncontextmenu = function () {
+  return false;
+};
+
+document.onkeydown = function (event) {
+  console.log(event);
+  if (event.key == " " && minNode) {
+    minNode.pinned = !minNode.pinned;
+  }
+};
