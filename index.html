@@ -10,9 +10,31 @@
     <link rel="stylesheet" href="./stylesheet.css" />
   </head>
   <body>
+    <div id="instructions">
+      <p>
+        Mouse 1: select any point <br />
+        Mouse 1 + Drag: pull point <br />
+        Mouse 2: select point of interest <br />
+        Mouse 2 + Drag: position point <br />
+        Space: pin current dragging point
+      </p>
+    </div>
+
     <span id="options">
       <button id="options-toggle">></button>
-      <div id="options-body"></div>
+      <div id="options-body">
+        <div class="slider">
+          <p class="slider-label">Gravity:</p>
+          <input type="range" min="1" max="100" value="50" class="slider-range" />
+          <input type="number" min="" max="" value="" class="slider-number" />
+        </div>
+
+        <div class="slider">
+          <p class="slider-label">Wind:</p>
+          <input type="range" min="1" max="100" value="50" class="slider-range" />
+          <input type="number" min="" max="" value="" class="slider-number" />
+        </div>
+      </div>
     </span>
     <canvas id="source"></canvas>
     <script src="./main.js" async defer type="module"></script>

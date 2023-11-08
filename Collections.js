@@ -66,7 +66,7 @@ export class Node {
 }
 
 export class Link {
-  constructor(nodeA, nodeB, length, stiffness = 0.1) {
+  constructor(nodeA, nodeB, length, stiffness = 0.5) {
     this.a = nodeA;
     this.b = nodeB;
     this.stiffness = stiffness;

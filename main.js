@@ -17,11 +17,16 @@ function loop(time) {
   updateCanvasSize();
 
   if (minNode) {
-    let dx = mousepos.x - minNode.pos.x;
-    let dy = mousepos.y - minNode.pos.y;
+    if (mousetype == 1) {
+      let dx = mousepos.x - minNode.pos.x;
+      let dy = mousepos.y - minNode.pos.y;
 
-    minNode.pos.x += 2 * dx * dt;
-    minNode.pos.y += 2 * dy * dt;
+      minNode.pos.x += 2 * dx * dt;
+      minNode.pos.y += 2 * dy * dt;
+    } else if (mousetype == 2) {
+      minNode.pos.x = mousepos.x;
+      minNode.pos.y = mousepos.y;
+    }
   }
 
   calculate(dt);
@@ -53,7 +58,7 @@ function render(dt) {
   }
 }
 
-let length = 500;
+let length = 250;
 let hl = length / 2;
 
 let node = new Node(5, ctx.canvas.width / 2 - hl, ctx.canvas.height / 2 - hl, 0, 0);
@@ -87,7 +92,7 @@ function generateRope(x, y, length, spacing) {
   }
 }
 
-generateRope(ctx.canvas.width / 2, ctx.canvas.height / 2, 50, 10);
+generateRope(ctx.canvas.width / 2, ctx.canvas.height / 2, 25, 50);
 
 function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiffness) {
   let grid = [];
@@ -192,7 +197,7 @@ function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiff
   }
 }
 
-generateGrid("corner-spaced", 100, 100, 30, 30, 10, 1, 1.5);
+generateGrid("corner-spaced", ctx.canvas.width / 2, ctx.canvas.height / 2, 40, 40, 10, 1, 1.5);
 
 function calculate(dt) {
   for (let node of nodes) {
@@ -213,7 +218,7 @@ let optionsOpen = false;
 optionsButton.onclick = function (event) {
   optionsOpen = !optionsOpen;
   if (optionsOpen) {
-    optionsBody.style.display = "block";
+    optionsBody.style.display = "flex";
   } else {
     optionsBody.style.display = "none";
   }
@@ -221,14 +226,17 @@ optionsButton.onclick = function (event) {
 
 let mousepos = { x: ctx.canvas.width / 2, y: ctx.canvas.height / 2 };
 let mousedown = false;
-document.addEventListener("mousemove", (event) => {
+let mousetype = 0;
+canvas.addEventListener("mousemove", (event) => {
   mousepos.x = event.clientX;
   mousepos.y = event.clientY;
 });
 
 let minNode = undefined;
-document.addEventListener("mousedown", (event) => {
+canvas.addEventListener("mousedown", (event) => {
   mousedown = true;
+
+  mousetype = event.buttons;
 
   let minDis = Number.MAX_SAFE_INTEGER;
   for (let node of nodes) {
@@ -245,12 +253,12 @@ document.addEventListener("mousedown", (event) => {
   }
 });
 
-document.addEventListener("mouseup", (event) => {
+canvas.addEventListener("mouseup", (event) => {
   minNode = undefined;
   mousedown = false;
 });
 
-document.oncontextmenu = function () {
+canvas.oncontextmenu = function () {
   return false;
 };
 
