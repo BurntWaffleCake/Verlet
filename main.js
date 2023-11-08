@@ -74,6 +74,21 @@ let link6 = new Link(node2, node4, Math.sqrt(2 * length ** 2));
 
 let links = [link, link2, link3, link4, link5, link6];
 
+function generateRope(x, y, length, spacing) {
+  let ropeNodes = [];
+  for (let i = 0; i < length; i++) {
+    let node = new Node(5, x + i * spacing, y);
+    nodes.push(node);
+    ropeNodes.push(node);
+  }
+
+  for (let i = 0; i < ropeNodes.length - 1; i++) {
+    links.push(new Link(ropeNodes[i], ropeNodes[i + 1], spacing, 2));
+  }
+}
+
+generateRope(ctx.canvas.width / 2, ctx.canvas.height / 2, 50, 10);
+
 function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiffness) {
   let grid = [];
   for (let sy = 0; sy < height; sy++) {
