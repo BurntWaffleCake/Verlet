@@ -17,13 +17,13 @@ function loop(time) {
   updateCanvasSize();
 
   if (minNode) {
-    if (mousetype == 1) {
+    if (!shiftDown) {
       let dx = mousepos.x - minNode.pos.x;
       let dy = mousepos.y - minNode.pos.y;
 
       minNode.pos.x += 2 * dx * dt;
       minNode.pos.y += 2 * dy * dt;
-    } else if (mousetype == 2) {
+    } else {
       minNode.pos.x = mousepos.x;
       minNode.pos.y = mousepos.y;
     }
@@ -58,26 +58,28 @@ function render(dt) {
   }
 }
 
-let length = 250;
-let hl = length / 2;
+function generateBox(x, y, width, height, radius, stiffness) {
+  let length = 250;
+  let hl = length / 2;
 
-let node = new Node(5, ctx.canvas.width / 2 - hl, ctx.canvas.height / 2 - hl, 0, 0);
-let node2 = new Node(5, ctx.canvas.width / 2 + hl, ctx.canvas.height / 2 - hl, 0, 0);
-let node3 = new Node(5, ctx.canvas.width / 2 + hl, ctx.canvas.height / 2 + hl, 0, 0);
-let node4 = new Node(5, ctx.canvas.width / 2 - hl, ctx.canvas.height / 2 + hl, 0, 0);
-// node3.pinned = true;
+  let node = new Node(5, x, y, 0, 0);
+  let node2 = new Node(5, x, y, 0, 0);
+  let node3 = new Node(5, x, y, 0, 0);
+  let node4 = new Node(5, x, y, 0, 0);
+  // node3.pinned = true;
 
-let nodes = [node, node2, node3, node4];
+  let link = new Link(node, node2, width);
+  let link2 = new Link(node2, node3, height);
+  let link3 = new Link(node3, node4, width);
+  let link4 = new Link(node4, node, height);
 
-let link = new Link(node, node2, length);
-let link2 = new Link(node2, node3, length);
-let link3 = new Link(node3, node4, length);
-let link4 = new Link(node4, node, length);
-
-let link5 = new Link(node, node3, Math.sqrt(2 * length ** 2));
-let link6 = new Link(node2, node4, Math.sqrt(2 * length ** 2));
-
-let links = [link, link2, link3, link4, link5, link6];
+  let link5 = new Link(node, node3, Math.sqrt(width ** 2 + height ** 2));
+  let link6 = new Link(node2, node4, Math.sqrt(width ** 2 + height ** 2));
+  links.push(link, link2, link3, link4, link5, link6);
+  nodes.push(node, node2, node3, node4);
+}
+let links = [];
+let nodes = [];
 
 function generateRope(x, y, length, spacing) {
   let ropeNodes = [];
@@ -197,7 +199,7 @@ function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiff
   }
 }
 
-generateGrid("corner-spaced", ctx.canvas.width / 2, ctx.canvas.height / 2, 40, 40, 10, 1, 1.5);
+generateGrid("corner-spaced", ctx.canvas.width / 2, ctx.canvas.height / 2, 30, 30, 10, 1, 1.5);
 
 function calculate(dt) {
   for (let node of nodes) {
@@ -227,6 +229,7 @@ optionsButton.onclick = function (event) {
 let mousepos = { x: ctx.canvas.width / 2, y: ctx.canvas.height / 2 };
 let mousedown = false;
 let mousetype = 0;
+let shiftDown = false;
 canvas.addEventListener("mousemove", (event) => {
   mousepos.x = event.clientX;
   mousepos.y = event.clientY;
@@ -263,8 +266,20 @@ canvas.oncontextmenu = function () {
 };
 
 document.onkeydown = function (event) {
-  console.log(event);
   if (event.key == " " && minNode) {
     minNode.pinned = !minNode.pinned;
+  } else if (event.key == "Shift") {
+    shiftDown = true;
+  }
+};
+
+document.onkeyup = function (event) {
+  switch (event.key) {
+    case "Shift":
+      shiftDown = false;
+      break;
+
+    default:
+      break;
   }
 };

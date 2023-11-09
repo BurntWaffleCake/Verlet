@@ -13,10 +13,17 @@ export class Node {
   }
 
   render(ctx) {
-    ctx.strokeStyle = "rgb(0,0,0)";
     ctx.beginPath();
     ctx.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI);
-    ctx.stroke();
+    if (this.pinned) {
+      ctx.strokeStyle = "rgb(0,0,255)";
+      ctx.fillStyle = "rgb(0,0,255)";
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.stroke();
+    }
   }
 
   constrain(width, height) {
@@ -70,6 +77,7 @@ export class Link {
     this.a = nodeA;
     this.b = nodeB;
     this.stiffness = stiffness;
+    this.visible = true;
     if (!length || typeof length != "number") {
       this.length = Math.sqrt((this.a.pos.x - this.b.pos.x) ** 2 + (this.a.pos.y - this.b.pos.y) ** 2);
     } else {
@@ -110,7 +118,11 @@ export class Link {
   }
 
   render(ctx) {
+    if (!this.visible) {
+      return;
+    }
     ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.lineWidth = 0.5;
 
     ctx.beginPath();
     ctx.moveTo(this.a.pos.x, this.a.pos.y);
