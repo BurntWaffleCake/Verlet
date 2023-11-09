@@ -38,9 +38,9 @@ function loop(time) {
 function init() {
   window.requestAnimationFrame(loop);
 }
-
+let links = [];
+let nodes = [];
 function render(dt) {
-  let size = 50;
   for (let node of nodes) {
     node.render(ctx);
   }
@@ -59,27 +59,25 @@ function render(dt) {
 }
 
 function generateBox(x, y, width, height, radius, stiffness) {
-  let length = 250;
-  let hl = length / 2;
+  let node = new Node(radius, x, y, 0, 0);
+  let node2 = new Node(radius, x + width, y, 0, 0);
+  let node3 = new Node(radius, x + width, y + height, 0, 0);
+  let node4 = new Node(radius, x, y + height, 0, 0);
 
-  let node = new Node(5, x, y, 0, 0);
-  let node2 = new Node(5, x, y, 0, 0);
-  let node3 = new Node(5, x, y, 0, 0);
-  let node4 = new Node(5, x, y, 0, 0);
-  // node3.pinned = true;
+  let link = new Link(node, node2, width, stiffness);
+  let link2 = new Link(node2, node3, height, stiffness);
+  let link3 = new Link(node3, node4, width, stiffness);
+  let link4 = new Link(node4, node, height, stiffness);
 
-  let link = new Link(node, node2, width);
-  let link2 = new Link(node2, node3, height);
-  let link3 = new Link(node3, node4, width);
-  let link4 = new Link(node4, node, height);
+  let link5 = new Link(node, node3, Math.sqrt(width ** 2 + height ** 2), stiffness);
+  let link6 = new Link(node2, node4, Math.sqrt(width ** 2 + height ** 2), stiffness);
 
-  let link5 = new Link(node, node3, Math.sqrt(width ** 2 + height ** 2));
-  let link6 = new Link(node2, node4, Math.sqrt(width ** 2 + height ** 2));
   links.push(link, link2, link3, link4, link5, link6);
   nodes.push(node, node2, node3, node4);
+  console.log(node, node2, node3, node4);
 }
-let links = [];
-let nodes = [];
+
+generateBox(ctx.canvas.width / 2, ctx.canvas.height / 2, 150, 150, 5);
 
 function generateRope(x, y, length, spacing) {
   let ropeNodes = [];
@@ -94,7 +92,7 @@ function generateRope(x, y, length, spacing) {
   }
 }
 
-generateRope(ctx.canvas.width / 2, ctx.canvas.height / 2, 25, 50);
+generateRope(ctx.canvas.width / 2, ctx.canvas.height / 2, 5, 50);
 
 function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiffness) {
   let grid = [];
