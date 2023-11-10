@@ -38,6 +38,7 @@ function loop(time) {
 function init() {
   window.requestAnimationFrame(loop);
 }
+
 let links = [];
 let nodes = [];
 function render(dt) {
@@ -47,6 +48,15 @@ function render(dt) {
 
   for (let link of links) {
     link.render(ctx);
+  }
+
+  for (let constraint of circleConstraints) {
+    ctx.beginPath();
+    ctx.arc(constraint.x, constraint.y, constraint.radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgb(0,0,0)";
+    // ctx.fillStyle = "rgb(0,0,0)";
+    // ctx.fill();
+    ctx.stroke();
   }
 
   if (minNode) {
@@ -197,12 +207,36 @@ function generateGrid(type, x, y, width, height, spacing = 10, radius = 1, stiff
   }
 }
 
-generateGrid("corner-spaced", ctx.canvas.width / 2, ctx.canvas.height / 2, 30, 30, 10, 1, 1.5);
+let circleConstraints = [];
+function addCircleConstraint(x, y, radius) {
+  circleConstraints.push({ x: x, y: y, radius: radius });
+}
 
+addCircleConstraint(ctx.canvas.width / 2 - 100, ctx.canvas.height / 2, 100);
+
+generateGrid("corner-spaced", ctx.canvas.width / 2, ctx.canvas.height / 2, 30, 30, 10, 1, 1.5);
+var gravity = 9.8;
+var wind = 0.0;
 function calculate(dt) {
   for (let node of nodes) {
     node.tick(dt, ctx);
+    if (!node.pinned) {
+      node.pos.y += gravity * dt;
+      node.pos.x += wind * dt;
+    }
     node.constrain(ctx.canvas.width, ctx.canvas.height);
+
+    for (const constraint of circleConstraints) {
+      let dx = node.pos.x - constraint.x;
+      let dy = node.pos.y - constraint.y;
+      let dis = Math.sqrt(dx ** 2 + dy ** 2);
+      if (node.radius + constraint.radius <= dis) {
+        continue;
+      }
+
+      node.pos.x = constraint.x + (dx / dis) * (node.radius + constraint.radius);
+      node.pos.y = constraint.y + (dy / dis) * (node.radius + constraint.radius);
+    }
   }
 
   for (let link of links) {
@@ -281,3 +315,13 @@ document.onkeyup = function (event) {
       break;
   }
 };
+
+document.getElementById("gravity-input").addEventListener("onvaluechange", (event) => {
+  gravity = event.detail.value;
+  console.log(event);
+});
+
+document.getElementById("wind-input").addEventListener("onvaluechange", (event) => {
+  wind = event.detail.value;
+  console.log(event);
+});

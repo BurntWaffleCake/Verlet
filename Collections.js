@@ -1,6 +1,4 @@
 export class Node {
-  static gravity = 9.8;
-
   constructor(radius = 10, x, y, dx = 0, dy = 0, mass = 1) {
     this.radius = radius;
     this.pinned = false;
@@ -67,8 +65,6 @@ export class Node {
 
     this.pos.x += Velx;
     this.pos.y += Vely;
-
-    this.pos.y += Node.gravity * dt;
   }
 }
 

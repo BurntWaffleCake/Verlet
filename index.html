@@ -21,22 +21,23 @@
     </div>
 
     <span id="options">
-      <button id="options-toggle">></button>
+      <button id="options-toggle">Options</button>
       <div id="options-body">
-        <div class="slider">
+        <div class="slider" label="Gravity:" min="-100" max="100" value="9.8" step=".1" id="gravity-input">
           <p class="slider-label">Gravity:</p>
-          <input type="range" min="1" max="100" value="50" class="slider-range" />
-          <input type="number" min="" max="" value="" class="slider-number" />
+          <input type="range" class="slider-range" />
+          <input type="number" class="slider-number" />
         </div>
 
-        <div class="slider">
+        <div class="slider" label="Wind:" min="-100" max="100" value="0" step=".1" id="wind-input">
           <p class="slider-label">Wind:</p>
-          <input type="range" min="1" max="100" value="50" class="slider-range" />
-          <input type="number" min="" max="" value="" class="slider-number" />
+          <input type="range" class="slider-range" />
+          <input type="number" class="slider-number" />
         </div>
       </div>
     </span>
     <canvas id="source"></canvas>
+    <script src="./components.js" async defer type="module"></script>
     <script src="./main.js" async defer type="module"></script>
   </body>
 </html>

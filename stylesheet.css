@@ -38,12 +38,12 @@ canvas {
   flex-direction: column;
   top: 1rem;
   right: 1rem;
-
-  width: 30rem;
+  width: 25%;
 }
 
 #options-toggle {
-  height: 1.5rem;
+  height: 2rem;
+  font-size: larger;
 
   width: 100%;
   border: none;
@@ -61,6 +61,7 @@ canvas {
 }
 
 .slider {
+  min-width: 0;
   align-self: flex-end;
 
   display: flex;
@@ -77,6 +78,7 @@ canvas {
 }
 
 .slider-label {
+  min-width: 0;
   vertical-align: middle;
   padding: 0;
   text-align: center;
@@ -88,9 +90,11 @@ canvas {
 }
 
 .slider-number {
+  min-width: 0;
   width: 4rem;
 }
 
 .slider-range {
+  min-width: 0;
   flex-grow: 1;
 }
